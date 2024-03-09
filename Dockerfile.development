@@ -1,0 +1,6 @@
+FROM rust:1.76
+WORKDIR /app
+RUN rustup component add rustfmt
+RUN rustup component add clippy
+RUN cargo install sqlx-cli --no-default-features --features native-tls,postgres
+CMD ["tail", "-f", "/dev/null"]

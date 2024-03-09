@@ -1,0 +1,41 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "--sql\n                SELECT * FROM create_new_transaction($1, $2, $3, $4)",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "balance",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "limit",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        {
+          "Custom": {
+            "name": "transaction_type",
+            "kind": {
+              "Enum": [
+                "c",
+                "d"
+              ]
+            }
+          }
+        },
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "914fd04c962a682da160dcf1d06a6ff42702e57379d847ce5d963d2c3196ffa3"
+}
