@@ -8,7 +8,8 @@ pub async fn get_postgres_pool() -> Result<Pool<Postgres>, Error> {
 
     PgPoolOptions::new()
         .acquire_timeout(Duration::from_secs(30))
-        .max_connections(5)
+        .min_connections(50)
+        .max_connections(50)
         .connect(&db_url)
         .await
 }
