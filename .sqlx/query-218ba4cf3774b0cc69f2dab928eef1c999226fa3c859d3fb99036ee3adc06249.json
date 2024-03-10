@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "--sql\n                    SELECT transaction.type AS \"transaction_type!:TransactionType\", TRIM(transaction.description) AS description, transaction.value, transaction.created_at AS accomplish_at\n                    FROM transaction \n                    WHERE transaction.user_id = $1 \n                    ORDER BY transaction.created_at DESC \n                    LIMIT 10",
+  "query": "--sql\n                    SELECT transaction.type AS \"transaction_type!:TransactionType\", TRIM(transaction.description) AS description, transaction.value, transaction.created_at AS accomplish_at\n                    FROM transaction \n                    WHERE transaction.user_id = $1 \n                    ORDER BY transaction.id DESC \n                    LIMIT 10",
   "describe": {
     "columns": [
       {
@@ -46,5 +46,5 @@
       false
     ]
   },
-  "hash": "0f074343bd982f632bc66ed90c239b041a73cdf1079616fc1cca4d18e7d44e63"
+  "hash": "218ba4cf3774b0cc69f2dab928eef1c999226fa3c859d3fb99036ee3adc06249"
 }
