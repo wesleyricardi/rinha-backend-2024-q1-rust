@@ -23,7 +23,7 @@ RUN cargo build --release
 
 # STAGE 4
 FROM gcr.io/distroless/cc-debian12
-ENV timezone="America/Sao_Paulo"
+ENV TZ="America/Sao_Paulo"
 COPY --from=builder /app/target/release/rinha-backend-2 /app/rinha-backend-2
 WORKDIR /app
 CMD ["./rinha-backend-2"]
