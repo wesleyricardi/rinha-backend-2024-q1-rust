@@ -38,19 +38,13 @@ impl<'a> TransactionModel<'a> {
                         if db_error.message() == "insufficient balance for transaction" {
                             Error::transaction_denied()
                         } else {
-                            log::error!("database_error: {}", db_error.message());
                             Error::other()
                         }
                     }
-                    sql_code => {
-                        log::error!("database_error: {}, sql code: {:?}", db_error.message(), sql_code);
-                        Error::other()
-                    },
+                    _ => Error::other(),
                 }
             }
-            err => {
-                log::error!("{:?}", err);
-                return Error::other()},
+            _ => return Error::other(),
         };
 
         Ok(ResponseBalance {

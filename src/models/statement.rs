@@ -26,7 +26,7 @@ impl<'a> StatementModel<'a> {
                 FROM user_limit
                 LEFT JOIN transaction ON user_limit.user_id = transaction.user_id
                 WHERE user_limit.user_id = $1
-                ORDER BY transaction.created_at DESC
+                ORDER BY transaction.id DESC
                 LIMIT 1"#,
             user_id
         )
@@ -37,7 +37,7 @@ impl<'a> StatementModel<'a> {
                     SELECT transaction.type AS "transaction_type!:TransactionType", TRIM(transaction.description) AS description, transaction.value, transaction.created_at AS accomplish_at
                     FROM transaction 
                     WHERE transaction.user_id = $1 
-                    ORDER BY transaction.created_at DESC 
+                    ORDER BY transaction.id DESC 
                     LIMIT 10"#, 
                 user_id)
             .fetch_all(self.pg_pool);
@@ -45,8 +45,7 @@ impl<'a> StatementModel<'a> {
         let (balance, last_transactions) = match try_join!(balance, last_transactions) {
             Ok((balance, transactions)) => (balance, transactions),
             Err(sqlx::Error::RowNotFound) => return Error::not_found(),
-            Err(err) => {
-                log::error!("{:?}", err);
+            Err(_) => {
                 return Error::other();
             }
         };

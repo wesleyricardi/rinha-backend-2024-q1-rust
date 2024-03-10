@@ -27,13 +27,11 @@ pub async fn create_transaction(
     app_state: web::Data<AppState>,
     request: web::Json<RequestTransaction>,
 ) -> impl Responder {
-    let transaction = TransactionModel::new(&app_state.pg_pool);
-
     if request.0.description.len() > 10 || request.0.description.is_empty() {
         return HttpResponse::UnprocessableEntity().finish();
     }
 
-    match transaction
+    match TransactionModel::new(&app_state.pg_pool)
         .create_new_transaction(param.user_id, request.0)
         .await
     {
