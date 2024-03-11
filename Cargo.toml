@@ -3,11 +3,10 @@ name = "rinha-backend-2"
 version = "0.1.0"
 edition = "2021"
 authors = ["Wesley Ricardi <wesley.ricardi@outlook.com>"]
-description = "Projeto de participação da rinha backend 2"
-documentation = "https://github.com/wesleyricardi/rinha_backend_2/tree/master/docs"
+description = "Projeto de participação da rinha backend 2024 q1"
 readme = "https://github.com/wesleyricardi/rinha_backend_2/blob/master/README.md"
 homepage = "http://localhost:8080/swagger-ui/#"
-repository = "https://github.com/wesleyricardi/rinha_backend_2/"
+repository = "https://github.com/wesleyricardi/rinha-backend-2024-q1-rust"
 license = "MIT"
 
 [dependencies]
