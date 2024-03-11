@@ -1,9 +1,6 @@
 use sqlx::PgPool;
 
-use crate::{
-    dtos::transaction::{RequestTransaction, ResponseBalance, TransactionType},
-    error::Error,
-};
+use crate::dtos::transaction::{RequestTransaction, ResponseBalance, TransactionType};
 
 pub struct TransactionModel<'a> {
     pg_pool: &'a PgPool,
@@ -18,8 +15,8 @@ impl<'a> TransactionModel<'a> {
         &self,
         user_id: i32,
         transaction: RequestTransaction,
-    ) -> Result<ResponseBalance, Error> {
-        let result = match sqlx::query!(
+    ) -> Result<ResponseBalance, TransactionModelError> {
+        let result = sqlx::query!(
             r#"--sql
                 SELECT * FROM create_new_transaction($1, $2, $3, $4)"#,
             user_id,
@@ -28,28 +25,41 @@ impl<'a> TransactionModel<'a> {
             transaction.value,
         )
         .fetch_one(self.pg_pool)
-        .await
-        {
-            Ok(balance) => balance,
-            Err(sqlx::Error::RowNotFound) => return Error::not_found(),
-            Err(sqlx::Error::Database(db_error)) => {
-                return match db_error.code().as_deref() {
-                    Some("P0001") => {
-                        if db_error.message() == "insufficient balance for transaction" {
-                            Error::transaction_denied()
-                        } else {
-                            Error::other()
-                        }
-                    }
-                    _ => Error::other(),
-                }
-            }
-            _ => return Error::other(),
-        };
+        .await?;
 
+        //safe unwrap
         Ok(ResponseBalance {
             balance: result.balance.unwrap(),
             limit: result.limit.unwrap(),
         })
+    }
+}
+
+pub enum TransactionModelError {
+    NotFound,
+    TransactionDenied,
+    Other,
+}
+
+pub(self) mod implementation_for_error {
+    use super::*;
+
+    impl From<sqlx::Error> for TransactionModelError {
+        fn from(sqlx_error: sqlx::Error) -> Self {
+            match sqlx_error {
+                sqlx::Error::RowNotFound => TransactionModelError::NotFound,
+                sqlx::Error::Database(db_error) => match db_error.code().as_deref() {
+                    Some("P0001") => {
+                        if db_error.message() == "insufficient balance for transaction" {
+                            return TransactionModelError::TransactionDenied;
+                        }
+
+                        TransactionModelError::Other
+                    }
+                    _others_db_error_code => TransactionModelError::Other,
+                },
+                _others_sqlx_error => TransactionModelError::Other,
+            }
+        }
     }
 }

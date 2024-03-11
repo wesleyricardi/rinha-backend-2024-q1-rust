@@ -4,7 +4,6 @@ use config::{error_handler, services::services_config};
 mod config;
 mod controllers;
 mod dtos;
-mod error;
 mod models;
 mod state;
 

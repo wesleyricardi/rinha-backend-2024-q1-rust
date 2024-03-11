@@ -2,7 +2,8 @@ use actix_web::{post, web, HttpResponse, Responder};
 use serde::Deserialize;
 
 use crate::{
-    dtos::transaction::RequestTransaction, error::Error, models::transaction::TransactionModel,
+    dtos::transaction::RequestTransaction,
+    models::transaction::{TransactionModel, TransactionModelError::*},
     state::AppState,
 };
 
@@ -36,8 +37,8 @@ pub async fn create_transaction(
         .await
     {
         Ok(success) => HttpResponse::Ok().json(success),
-        Err(Error::NotFound) => HttpResponse::NotFound().finish(),
-        Err(Error::TransactionDenied) => HttpResponse::UnprocessableEntity().finish(),
-        _ => HttpResponse::InternalServerError().finish(),
+        Err(NotFound) => HttpResponse::NotFound().finish(),
+        Err(TransactionDenied) => HttpResponse::UnprocessableEntity().finish(),
+        Err(Other) => HttpResponse::InternalServerError().finish(),
     }
 }

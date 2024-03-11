@@ -2,13 +2,10 @@ use chrono::Utc;
 use sqlx::PgPool;
 use tokio::try_join;
 
-use crate::{
-    dtos::{
+use crate::dtos::{
         statement::{Balance, ResponseStatement, Transaction},
         transaction::TransactionType,
-    },
-    error::Error,
-};
+    };
 
 pub struct StatementModel<'a> {
     pg_pool: &'a PgPool,
@@ -19,7 +16,7 @@ impl<'a> StatementModel<'a> {
         Self { pg_pool }
     }
 
-    pub async fn get_statement(&self, user_id: i32) -> Result<ResponseStatement, Error> {
+    pub async fn get_statement(&self, user_id: i32) -> Result<ResponseStatement, StatementModelError> {
         let balance = sqlx::query!(
             r#"--sql
                 SELECT user_limit.limit, COALESCE(transaction.current_balance, 0) AS current_balance
@@ -42,13 +39,7 @@ impl<'a> StatementModel<'a> {
                 user_id)
             .fetch_all(self.pg_pool);
 
-        let (balance, last_transactions) = match try_join!(balance, last_transactions) {
-            Ok((balance, transactions)) => (balance, transactions),
-            Err(sqlx::Error::RowNotFound) => return Error::not_found(),
-            Err(_) => {
-                return Error::other();
-            }
-        };
+        let (balance, last_transactions) = try_join!(balance, last_transactions)?;
 
         Ok(ResponseStatement {
             balance: Balance {
@@ -58,5 +49,23 @@ impl<'a> StatementModel<'a> {
             },
             last_transactions,
         })
+    }
+}
+
+pub enum StatementModelError {
+    NotFound,
+    Other,
+}
+
+pub(self) mod implementation_for_error {
+    use super::*;
+
+    impl From<sqlx::Error> for StatementModelError {
+        fn from(sqlx_error: sqlx::Error) -> Self {
+            match sqlx_error {
+                sqlx::Error::RowNotFound => StatementModelError::NotFound,
+                _others => StatementModelError::Other,
+            }
+        }
     }
 }

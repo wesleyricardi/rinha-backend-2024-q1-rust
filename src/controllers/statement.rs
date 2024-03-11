@@ -1,7 +1,10 @@
 use actix_web::{get, web, HttpResponse, Responder};
 use serde::Deserialize;
 
-use crate::{error::Error, models::statement::StatementModel, state::AppState};
+use crate::{
+    models::statement::{StatementModel, StatementModelError::*},
+    state::AppState,
+};
 
 #[derive(Deserialize)]
 struct Params {
@@ -26,7 +29,7 @@ pub async fn get_statement(
         .await
     {
         Ok(success) => HttpResponse::Ok().json(success),
-        Err(Error::NotFound) => HttpResponse::NotFound().finish(),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(NotFound) => HttpResponse::NotFound().finish(),
+        Err(Other) => HttpResponse::InternalServerError().finish(),
     }
 }

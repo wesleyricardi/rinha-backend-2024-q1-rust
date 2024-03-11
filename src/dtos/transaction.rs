@@ -20,7 +20,7 @@ pub struct RequestTransaction {
     #[schema(example = "c", rename = "tipo", value_type = String)]
     pub transaction_type: TransactionType,
     #[serde(rename(deserialize = "descricao"))]
-    #[schema(example = "alguma descrição", rename = "descricao")]
+    #[schema(example = "descrição", rename = "descricao")]
     pub description: String,
 }
 
